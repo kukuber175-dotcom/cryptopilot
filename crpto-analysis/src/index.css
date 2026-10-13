@@ -1,0 +1,186 @@
+ :root {
+	font-family: Inter, system-ui, Arial, sans-serif;
+	color: #edf3ff;
+	background: #08111f;
+	font-synthesis: none;
+}
+
+* { box-sizing: border-box; }
+
+body {
+	margin: 0;
+	min-width: 320px;
+	background: #08111f;
+}
+
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+
+.dashboard {
+	width: min(1200px, 100%);
+	margin: 0 auto;
+	padding: 24px;
+}
+
+.topbar, .market-heading, .coin, .coin-name,
+.filter-row, .signal-row, .signal-item, .chart-legend {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 14px;
+}
+
+.topbar {
+	padding-bottom: 20px;
+	border-bottom: 1px solid #1c2b40;
+}
+
+.topbar h2 { margin: 0; }
+.topbar h2 span { color: #65a8ff; }
+.status, .muted, .note { color: #91a3ba; }
+.status { font-size: 12px; }
+
+.hero { padding: 38px 0 24px; }
+.hero h1 { margin: 6px 0; font-size: clamp(28px, 5vw, 44px); }
+.hero p:last-child { color: #a5b4c9; }
+
+.eyebrow {
+	color: #65a8ff;
+	font-size: 11px;
+	font-weight: 800;
+	letter-spacing: 1.6px;
+}
+
+.market {
+	margin: 20px 0;
+	padding: 22px;
+	background: #101b2c;
+	border: 1px solid #22344b;
+	border-radius: 16px;
+	min-width: 0;
+}
+
+.market h2 { margin: 4px 0 14px; }
+.market h3 { margin: 10px 0; font-size: 27px; overflow-wrap: anywhere; }
+.market h3 small { font-size: 13px; color: #91a3ba; }
+
+.search, .time-controls select, .custom-time input {
+	color: #edf3ff;
+	background: #091321;
+	border: 1px solid #30435b;
+	border-radius: 9px;
+	padding: 11px 12px;
+}
+
+.search { width: 100%; margin: 12px 0; }
+.search:focus, input:focus, select:focus {
+	outline: 2px solid #65a8ff;
+	outline-offset: 1px;
+}
+
+.filter-row { justify-content: flex-start; margin: 4px 0 16px; }
+.filter, .custom-time button {
+	color: #cbd8e9;
+	background: #17253a;
+	border: 1px solid #30435b;
+	border-radius: 8px;
+	padding: 9px 13px;
+}
+.filter.active, .custom-time button {
+	color: white;
+	background: #2869bd;
+	border-color: #2869bd;
+}
+
+.coin-list {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 8px;
+	max-height: 450px;
+	overflow: auto;
+}
+
+.coin {
+	min-width: 0;
+	width: 100%;
+	padding: 13px;
+	text-align: left;
+	color: #edf3ff;
+	background: #0b1625;
+	border: 1px solid #203149;
+	border-radius: 10px;
+}
+.coin:hover, .coin.selected {
+	border-color: #65a8ff;
+	background: #13243a;
+}
+.coin > strong { font-size: 13px; text-align: right; overflow-wrap: anywhere; }
+.coin-name { justify-content: flex-start; min-width: 70px; }
+.coin-name strong { display: block; }
+.coin-name small { color: #91a3ba; font-size: 11px; }
+
+.positive { color: #29d391 !important; }
+.negative { color: #ff6577 !important; }
+.error { color: #ff9ca8; padding: 10px 0; }
+.note { font-size: 12px; line-height: 1.65; margin-top: 18px; }
+
+.analytics { margin-top: 24px; }
+.time-controls {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 7px;
+	min-width: 130px;
+}
+.time-controls label { color: #91a3ba; font-size: 12px; }
+.time-controls select { width: 100%; }
+.custom-time { display: flex; gap: 5px; }
+.custom-time input { width: 70px; min-width: 0; }
+.custom-time button { padding: 8px; }
+
+.signal-row {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	margin: 24px 0 16px;
+	padding: 16px;
+	background: #0b1625;
+	border: 1px solid #203149;
+	border-radius: 12px;
+}
+.signal-row div { min-width: 0; }
+.signal-row small, .signal-row strong { display: block; }
+.signal-row small { color: #91a3ba; font-size: 12px; margin-bottom: 7px; }
+.signal-row strong { overflow-wrap: anywhere; }
+
+.chart-legend {
+	justify-content: flex-start;
+	flex-wrap: wrap;
+	font-size: 12px;
+	margin: 18px 0 8px;
+}
+.legend-price { color: #65a8ff; }
+.chart { width: 100%; height: 360px; }
+.signal-details { margin-top: 24px; }
+.signal-item {
+	padding: 12px 0;
+	border-bottom: 1px solid #22344b;
+	font-size: 13px;
+	flex-wrap: wrap;
+}
+.signal-item strong { margin-left: auto; }
+
+@media (max-width: 700px) {
+	.dashboard { padding: 14px; }
+	.market { padding: 15px; }
+	.coin-list { grid-template-columns: 1fr; }
+	.coin { gap: 8px; }
+	.signal-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+	.market-heading { align-items: flex-start; }
+	.status { font-size: 10px; }
+}
+
+@media (max-width: 420px) {
+	.topbar { align-items: flex-start; flex-direction: column; }
+	.market-heading { flex-direction: column; }
+	.time-controls { width: 100%; }
+}
