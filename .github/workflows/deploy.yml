@@ -19,15 +19,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: crpto-analysis/package-lock.json
+
       - run: npm ci
         working-directory: crpto-analysis
+
       - run: npm run build
         working-directory: crpto-analysis
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: crpto-analysis/dist
@@ -41,3 +48,4 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+        
