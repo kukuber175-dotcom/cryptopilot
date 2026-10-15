@@ -1,4 +1,5 @@
 
+
 import { useEffect, useRef, useState } from 'react';
 import {
   createChart,
@@ -55,31 +56,48 @@ function calculateRSI(candles, period = 14) {
   let gains = 0;
   let losses = 0;
 
-  for (
-    let i = candles.length - period;
-    i < candles.length;
-    i++
-  ) {
-    const change = candles[i].close - candles[i - 1].close;
+  for (let i = 1; i <= period; i++) {
+    const change =
+      candles[i].close - candles[i - 1].close;
 
-    if (change > 0) gains += change;
-    else losses += Math.abs(change);
+    if (change > 0) {
+      gains += change;
+    } else {
+      losses += Math.abs(change);
+    }
   }
 
-  const averageGain = gains / period;
-  const averageLoss = losses / period;
+  let avgGain = gains / period;
+  let avgLoss = losses / period;
 
-  if (averageLoss === 0) {
-    return averageGain === 0 ? 50 : 100;
+  for (let i = period + 1; i < candles.length; i++) {
+    const change =
+      candles[i].close - candles[i - 1].close;
+
+    const gain = Math.max(change, 0);
+    const loss = Math.max(-change, 0);
+
+    avgGain =
+      (avgGain * (period - 1) + gain) / period;
+
+    avgLoss =
+      (avgLoss * (period - 1) + loss) / period;
   }
 
-  const rs = averageGain / averageLoss;
+  if (avgLoss === 0) {
+    return avgGain === 0 ? 50 : 100;
+  }
+
+  const rs = avgGain / avgLoss;
 
   return 100 - 100 / (1 + rs);
 }
 
 function formatPrice(value) {
-  if (value == null || !Number.isFinite(Number(value))) {
+  if (
+    value == null ||
+    !Number.isFinite(Number(value))
+  ) {
     return '—';
   }
 
@@ -102,7 +120,7 @@ export default function Scalping() {
   const ema9SeriesRef = useRef(null);
   const ema21SeriesRef = useRef(null);
 
-  // Create chart once and resize it with the panel
+  // Create chart
   useEffect(() => {
     const container = containerRef.current;
 
@@ -111,35 +129,43 @@ export default function Scalping() {
     const chart = createChart(container, {
       width: container.clientWidth || 600,
       height: 360,
+
       layout: {
         background: { color: '#0b1220' },
         textColor: '#cbd5e1',
       },
+
       grid: {
         vertLines: { color: '#1e293b' },
         horzLines: { color: '#1e293b' },
       },
+
       rightPriceScale: {
         borderColor: '#334155',
       },
+
       timeScale: {
         borderColor: '#334155',
         timeVisible: true,
         secondsVisible: false,
       },
+
       crosshair: {
         vertLine: { color: '#64748b' },
         horzLine: { color: '#64748b' },
       },
     });
 
-    const candleSeries = chart.addSeries(CandlestickSeries, {
-      upColor: '#22c55e',
-      downColor: '#ef4444',
-      borderVisible: false,
-      wickUpColor: '#22c55e',
-      wickDownColor: '#ef4444',
-    });
+    const candleSeries = chart.addSeries(
+      CandlestickSeries,
+      {
+        upColor: '#22c55e',
+        downColor: '#ef4444',
+        borderVisible: false,
+        wickUpColor: '#22c55e',
+        wickDownColor: '#ef4444',
+      }
+    );
 
     const ema9Series = chart.addSeries(LineSeries, {
       color: '#38bdf8',
@@ -179,7 +205,7 @@ export default function Scalping() {
     };
   }, []);
 
-  // Load Binance candles and refresh every 15 seconds
+  // Load public Binance Spot candles
   useEffect(() => {
     let active = true;
 
@@ -189,13 +215,14 @@ export default function Scalping() {
         setError('');
 
         const url =
-          `${API}?symbol=${symbol}&interval=${interval}&limit=500`;
+          `${API}?symbol=${symbol}` +
+          `&interval=${interval}&limit=500`;
 
         const response = await fetch(url);
 
         if (!response.ok) {
           throw new Error(
-            'Market data unavailable. Please try another pair.'
+            'Market data unavailable. Try another pair.'
           );
         }
 
@@ -224,7 +251,9 @@ export default function Scalping() {
           );
         }
       } finally {
-        if (active) setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
     }
 
@@ -238,7 +267,7 @@ export default function Scalping() {
     };
   }, [symbol, interval]);
 
-  // Update chart and indicator lines
+  // Update chart
   useEffect(() => {
     if (
       !candles.length ||
@@ -250,14 +279,21 @@ export default function Scalping() {
     }
 
     candleSeriesRef.current.setData(candles);
-    ema9SeriesRef.current.setData(calculateEMA(candles, 9));
-    ema21SeriesRef.current.setData(calculateEMA(candles, 21));
+
+    ema9SeriesRef.current.setData(
+      calculateEMA(candles, 9)
+    );
+
+    ema21SeriesRef.current.setData(
+      calculateEMA(candles, 21)
+    );
 
     chartRef.current?.timeScale().fitContent();
   }, [candles]);
 
   const current = candles[candles.length - 1];
   const rsi = calculateRSI(candles);
+
   const ema9 = calculateEMA(candles, 9);
   const ema21 = calculateEMA(candles, 21);
 
@@ -306,7 +342,9 @@ export default function Scalping() {
           Trading Pair
           <select
             value={symbol}
-            onChange={(event) => setSymbol(event.target.value)}
+            onChange={(event) =>
+              setSymbol(event.target.value)
+            }
           >
             {PAIRS.map((pair) => (
               <option key={pair.value} value={pair.value}>
@@ -333,22 +371,30 @@ export default function Scalping() {
         </label>
       </div>
 
-      {error && <p className="scalp-error">{error}</p>}
+      {error && (
+        <p className="scalp-error">{error}</p>
+      )}
 
       {loading && (
-        <p className="scalp-muted">Loading candles...</p>
+        <p className="scalp-muted">
+          Loading candles...
+        </p>
       )}
 
       {current && (
         <div className="scalp-stats">
           <div>
             <span>Latest Close</span>
-            <strong>{formatPrice(current.close)} USDT</strong>
+            <strong>
+              {formatPrice(current.close)} USDT
+            </strong>
           </div>
 
           <div>
             <span>RSI (14)</span>
-            <strong>{rsi == null ? '—' : rsi.toFixed(2)}</strong>
+            <strong>
+              {rsi == null ? '—' : rsi.toFixed(2)}
+            </strong>
           </div>
 
           <div>
@@ -363,11 +409,16 @@ export default function Scalping() {
         </div>
       )}
 
-      <div className="scalp-chart" ref={containerRef} />
+      <div
+        className="scalp-chart"
+        ref={containerRef}
+      />
 
       <div className="scalp-signal">
         <span>Indicator Summary</span>
-        <strong className={signalClass}>{signal}</strong>
+        <strong className={signalClass}>
+          {signal}
+        </strong>
       </div>
 
       <p className="scalp-muted scalp-footnote">
@@ -377,8 +428,9 @@ export default function Scalping() {
       </p>
 
       <p className="scalp-disclaimer">
-        Educational indicators only. Signals are not guaranteed
-        trading recommendations. No orders are placed.
+        Educational indicators only. Signals are not
+        guaranteed trading recommendations. No orders
+        are placed.
       </p>
     </section>
   );
